@@ -14,6 +14,13 @@ class Led:
         GPIO.setup(self.gpio_number , GPIO.OUT)
         self._on = False
 
+        self._init_light_freq(hertz = 100)
+
+    def _init_light_freq(self , hertz):
+
+        self.pwd_led = GPIO.PWM(self.gpio_number , hertz)
+        self.pwd_led.start(100) # starting the duty circle with 100 %
+
 
     def is_on(self):
         return self._on
@@ -43,15 +50,40 @@ class Led:
             sleep(delay_seconds)
 
 
-def main():
+    def set_light_brightness(self , brightness_value):
+
+        if brightness_value < 0 or brightness_value > 100:
+            raise RuntimeError("brightness value is a percentage and it should be between 0 and 100.")
+
+        self.pwd_led.ChangeDutyCycle(brightness_value)
+
+
+def test_beeping():
 
     led = Led(gpio_number = 18)
     led.beep_for(times = 5 , delay_seconds = 0.5)
 
+def test_brightness():
+
+    led = Led(gpio_number = 18)
+    led.turn_on()
+
+    while True:
+
+        brightness_value = input("Enter the brightness value (0-100) or enter 'q' to quit:")
+
+        if brightness_value == "q":
+            print("Time to break")
+            break
+
+
+        led.set_light_brightness(int(brightness_value))
+
+
 
 
 if __name__ == "__main__":
-    safe_main(main)
+    safe_main(test_brightness)
 
 
 
